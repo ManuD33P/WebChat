@@ -50,7 +50,9 @@ export default function ChatApp() {
   }
 
   useEffect(()=>{
-    socketService?.connect('http://localhost:3000');
+    const {SERVER_URL_CHAT} = process.env;
+    socketService?.connect(SERVER_URL_CHAT || 'http://184.72.93.212:4000');
+
     const onRejected = (event) => {
         console.log(event)
         const msg = event.detail;
