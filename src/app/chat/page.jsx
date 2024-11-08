@@ -51,7 +51,7 @@ export default function ChatApp() {
 
   useEffect(()=>{
     const {SERVER_URL_CHAT} = process.env;
-    socketService?.connect(SERVER_URL_CHAT || 'http://184.72.93.212:4000');
+    socketService?.connect(SERVER_URL_CHAT || 'https://serverwebchat.onrender.com');
 
     const onRejected = (event) => {
         console.log(event)
