@@ -15,6 +15,7 @@ export default function ChatArea({ isPrivate = false, to = null, user}) {
       setMessage('')
     }
   }
+  const handleKeyDown = (e) => { if (e.key === 'Enter') { handleSend(); } };
 
   useEffect(()=>{
       const handleReceivedMessage = (event)=> {
@@ -60,6 +61,7 @@ export default function ChatArea({ isPrivate = false, to = null, user}) {
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Escribe un mensaje..."
             className="flex-grow mr-2"
           />
