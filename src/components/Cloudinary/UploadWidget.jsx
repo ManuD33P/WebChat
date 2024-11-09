@@ -1,7 +1,7 @@
 import { CldUploadWidget } from 'next-cloudinary';
  
 
-export default ({onSuccess}) => {
+export default function UploadWidget ({onSuccess})  {
 
     return(
         <CldUploadWidget 
