@@ -58,7 +58,7 @@ export default function UserList({ currentUser, onStartPrivateChat, onClose }) {
 
     };
 
-  },[])
+  },[users?.length])
 
   return (
     <div className="w-64 md:w-1/4 border-r flex-shrink-0 bg-white">
