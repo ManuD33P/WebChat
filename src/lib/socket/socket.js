@@ -9,9 +9,13 @@ class SocketService extends EventTarget {
         return SocketService.instance;
     }
 
-    connect(url) {
+    connect(url,preferent=null) {
         if (!this.socket) {
-            this.socket = io(url);
+            if(preferent){
+                this.socket = io(url);
+            } else {
+                this.socket = io(url,{query:preferent});
+            }
 
             this.socket.on('connect', () => this.dispatchEvent(new Event('connect')));
             this.socket.on('disconnect', () => this.dispatchEvent(new CustomEvent('disconnect')));

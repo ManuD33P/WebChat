@@ -28,9 +28,11 @@ export default function ChatApp() {
   const [privateChats, setPrivateChats] = useState([])
   const windowWidth = useWindowWidth();
 
+  const saveToLocalStorage = (key, value) => { if (typeof window !== 'undefined') { localStorage.setItem(key, value); }}
   const handleJoin = (nick) => {
     setUser(prev => ({ ...prev, nick }))
     socketService.joinRoom({...user,nick:nick})
+    saveToLocalStorage(user,{...user,nick:nick});
     setShowModal(false)
   }
 
@@ -55,9 +57,12 @@ export default function ChatApp() {
       setActiveTab('main')
     }
   }
+  
+  const getFromLocalStorage = (key) => { if (typeof window !== 'undefined') { return localStorage.getItem(key); } };
 
   const handleUpdateUser = (updatedUser) => {
     setUser(updatedUser)
+    saveToLocalStorage(updatedUser)
     // Aquí iría la lógica para actualizar el usuario en el servidor
   }
 
@@ -67,7 +72,12 @@ export default function ChatApp() {
     socketService?.connect(SERVER_URL_CHAT || 'https://serverwebchat.onrender.com');
 
     const onReconnected = ()=>{
-        !socketService.isConnected() && socketService?.connect(SERVER_URL_CHAT || 'https://serverwebchat.onrender.com');
+        if(!socketService.isConnected()){
+          const user = getFromLocalStorage(user)
+          console.log('valor de user ',user);
+          socketService?.connect(SERVER_URL_CHAT || 'https://serverwebchat.onrender.com', user || null);
+        }
+        
     }
 
 
