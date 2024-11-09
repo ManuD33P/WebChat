@@ -11,9 +11,12 @@ import { socketService } from '@/lib/socket/socket'
 import useWindowWidth from '@/hooks/useWindowWidth'
 import { Users, X } from "lucide-react"
 import { Label } from '@/components/ui/label'
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 export default function ChatApp() {
   const [showModal, setShowModal] = useState(true)
   const [showUserList, setShowUserList] = useState(false)
+  const [activeMobileChat, setActiveMobileChat] = useState(null)
+
   const [user, setUser] = useState({
     nick: '',
     avatar: '/default-avatar.png',
@@ -34,14 +37,23 @@ export default function ChatApp() {
   const handleStartPrivateChat = (otherUser) => {
     const existingChat = privateChats.find(chat => chat.user === otherUser)
     if (!existingChat) {
-      setPrivateChats(prev => [...prev, { user: otherUser, messages: [] }])
+      setPrivateChats(prev => [...prev, { user: otherUser, messages: [], avatar: `/avatar-${otherUser}.png` }])
     }
-    setActiveTab(otherUser)
+    if (windowWidth >= 768) {
+      setActiveTab(otherUser)
+    } else {
+      setActiveMobileChat(otherUser)
+    }
+    setShowUserList(false)
   }
-
   const handleClosePrivateChat = (userToClose) => {
     setPrivateChats(prev => prev.filter(chat => chat.user !== userToClose))
-    setActiveTab('main')
+    if (activeMobileChat === userToClose) {
+      setActiveMobileChat(null)
+    }
+    if (activeTab === userToClose) {
+      setActiveTab('main')
+    }
   }
 
   const handleUpdateUser = (updatedUser) => {
@@ -66,7 +78,64 @@ export default function ChatApp() {
     }
   },[])
 
+  
+  const renderMobilePrivateChats = () => (
+    <div className="fixed left-[10%]  transform translate-x-1/2 bottom-4 flex flex-row-reverse items-end space-x-2 space-x-reverse md:hidden">
+      {privateChats.map((chat) => (
+        <div
+          key={chat.user}
+          className="group relative"
+        >
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full w-12 h-12 p-0 relative transition-transform group-hover:-translate-y-1"
+            onClick={() => setActiveMobileChat(chat.user)}
+            aria-label={`Chat privado con ${chat.user}`}
+          >
+            <Avatar className="h-full w-full">
+              <AvatarImage src={chat.avatar} alt={chat.user} />
+              <AvatarFallback>{chat.user[0]}</AvatarFallback>
+            </Avatar>
+            {chat.unreadCount > 0 && (
+              <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                {chat.unreadCount}
+              </span>
+            )}
+          </Button>
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            {chat.user}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
 
+  const renderMobileActiveChatModal = () => {
+    if (!activeMobileChat) return null
+    const chat = privateChats.find(c => c.user === activeMobileChat)
+    if (!chat) return null
+
+    return (
+      <div className="fixed inset-0 bg-background z-50 flex flex-col md:hidden">
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center">
+            <Avatar className="h-8 w-8 mr-2">
+              <AvatarImage src={chat.avatar} alt={chat.user} />
+              <AvatarFallback>{chat.user[0]}</AvatarFallback>
+            </Avatar>
+            <span className="font-semibold">{chat.user}</span>
+          </div>
+          <Button variant="ghost" size="icon" onClick={() => setActiveMobileChat(null)}>
+            <X className="h-6 w-6" />
+          </Button>
+        </div>
+        <div className="flex-grow overflow-hidden">
+          <ChatArea messages={chat.messages} onSendMessage={() => {}} isPrivate={true} to={chat.user} />
+        </div>
+      </div>
+    )
+  }
 return (
     <div className="h-screen bg-gray-100 flex flex-col p-4">
       {showModal && <JoinModal onJoin={handleJoin} />}
@@ -85,7 +154,7 @@ return (
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-grow flex flex-col">
               <TabsList className="w-full justify-start overflow-x-auto">
                 <TabsTrigger value="main">Chat Principal</TabsTrigger>
-                {privateChats.map((chat, index) => (
+                {windowWidth >= 768 && privateChats.map((chat, index) => (
                   <TabsTrigger key={index} value={chat.user} className="flex items-center">
                     {chat.user}
                     <Label
@@ -118,14 +187,16 @@ return (
             <Button
               variant="outline"
               size="icon"
-              className="absolute bottom-4 right-4 rounded-full md:hidden"
+              className="fixed left-4 bottom-4 rounded-full md:hidden"
               onClick={() => setShowUserList(!showUserList)}
             >
-              <Users className="h-6 w-6" />
+             <Users className="h-6 w-6" />
             </Button>
+            {renderMobilePrivateChats()}
           </div>
         </CardContent>
       </Card>
+      {renderMobileActiveChatModal()}
     </div>
   )
 }
