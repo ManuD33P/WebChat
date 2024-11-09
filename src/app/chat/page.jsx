@@ -28,7 +28,7 @@ export default function ChatApp() {
   const [privateChats, setPrivateChats] = useState([])
   const windowWidth = useWindowWidth();
 
-  const saveToLocalStorage = (key, value) => { if (typeof window !== 'undefined') { localStorage.setItem(key, value); }}
+  const saveToLocalStorage = (key, value) => { if (typeof window !== 'undefined') { localStorage.setItem(key, JSON.stringify(value)); }}
   const handleJoin = (nick) => {
     setUser(prev => ({ ...prev, nick }))
     socketService.joinRoom({...user,nick:nick})
@@ -58,7 +58,7 @@ export default function ChatApp() {
     }
   }
   
-  const getFromLocalStorage = (key) => { if (typeof window !== 'undefined') { return localStorage.getItem(key); } };
+  const getFromLocalStorage = (key) => { if (typeof window !== 'undefined') { return JSON.parse(localStorage.getItem(key)); } };
 
   const handleUpdateUser = (updatedUser) => {
     setUser(updatedUser)
