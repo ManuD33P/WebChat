@@ -14,7 +14,7 @@ class SocketService extends EventTarget {
             this.socket = io(url);
 
             this.socket.on('connect', () => this.dispatchEvent(new Event('connect')));
-            this.socket.on('disconnect', () => this.dispatchEvent(new Event('disconnect')));
+            this.socket.on('disconnect', () => this.dispatchEvent(new CustomEvent('disconnect')));
             this.socket.on('Public_Message', (data) => this.dispatchEvent(new CustomEvent('Public_Message', { detail: data })));
             this.socket.on('Public_Message_Event', (data) => this.dispatchEvent(new CustomEvent('Public_Message_Event', { detail: data })));
             this.socket.on('onJoin', (user) => this.dispatchEvent(new CustomEvent('onJoin', { detail: user })));

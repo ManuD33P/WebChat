@@ -50,8 +50,14 @@ export default function ChatApp() {
   }
 
   useEffect(()=>{
-    const {SERVER_URL_CHAT} = process.env;
+    const SERVER_URL_CHAT = process.env.SERVER_URL_CHAT;
+    
     socketService?.connect(SERVER_URL_CHAT || 'https://serverwebchat.onrender.com');
+
+    const onReconnected = ()=>{
+        !socketService.isConnected() && socketService?.connect(SERVER_URL_CHAT || 'https://serverwebchat.onrender.com');
+    }
+
 
     const onRejected = (event) => {
         console.log(event)
@@ -59,8 +65,12 @@ export default function ChatApp() {
         alert(msg)
         setShowModal(true);
     };
+    
+    
     // Aquí iría la lógica para unirse al chat
-    socketService.addEventListener('onRejected',onRejected)
+    socketService.addEventListener('onRejected',onRejected);
+    socketService.addEventListener('disconnect',onReconnected);
+
     return () => {
         socketService.removeEventListener('onRejected', onRejected);
     }

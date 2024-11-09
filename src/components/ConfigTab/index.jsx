@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { socketService } from '@/lib/socket/socket'
+import UploadWidget from '../Cloudinary/UploadWidget'
 export default function ConfigTab({ user, onUpdateUser }) {
   const [tempUser, setTempUser] = useState(user)
   const [avatarFile, setAvatarFile] = useState(null)
@@ -17,6 +18,7 @@ export default function ConfigTab({ user, onUpdateUser }) {
       setTempUser({ ...tempUser, [e.target.name]: e.target.value })
     }
   }
+  const handleUpload = (info) => { setTempUser({ ...tempUser, avatar: info.secure_url }); };
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -33,7 +35,10 @@ export default function ConfigTab({ user, onUpdateUser }) {
             <AvatarImage src={tempUser.avatar} alt={tempUser.nick} />
             <AvatarFallback>{tempUser.nick.charAt(0)}</AvatarFallback>
           </Avatar>
-          <Input id="avatar" name="avatar" type="file" onChange={handleChange} />
+
+          {/*                 REMPLAZAR CON CLOUDINARY        */}
+          {/* <Input id="avatar" name="avatar" type="file" onChange={handleChange} /> */}
+          <UploadWidget id="avatar" name="avatar" onSuccess={handleUpload} />
         </div>
       </div>
       
