@@ -32,7 +32,7 @@ export default function ChatApp() {
   const handleJoin = (nick) => {
     setUser(prev => ({ ...prev, nick }))
     socketService.joinRoom({...user,nick:nick})
-    saveToLocalStorage(user,{...user,nick:nick});
+    saveToLocalStorage("user",{...user,nick:nick});
     setShowModal(false)
   }
 
@@ -62,7 +62,7 @@ export default function ChatApp() {
 
   const handleUpdateUser = (updatedUser) => {
     setUser(updatedUser)
-    saveToLocalStorage(updatedUser)
+    saveToLocalStorage("user",updatedUser)
     // Aquí iría la lógica para actualizar el usuario en el servidor
   }
 
@@ -73,7 +73,7 @@ export default function ChatApp() {
 
     const onReconnected = ()=>{
         if(!socketService.isConnected()){
-          const user = getFromLocalStorage(user)
+          const user = getFromLocalStorage("user")
           console.log('valor de user ',user);
           socketService?.connect(SERVER_URL_CHAT || 'https://serverwebchat.onrender.com', user || null);
         }
